@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'path';
+import { Order, Otp, Refresh, Service, User } from 'src/entities';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { join } from 'path';
         username: configService.get<string>('database.user'),
         password: configService.get<string>('database.pass'),
         database: configService.get<string>('database.database'),
-        entities: [join(__dirname, 'dist/entities/index.js')],
+        entities: [User, Otp, Refresh, Service, Order],
         synchronize: true,
       }),
     }),

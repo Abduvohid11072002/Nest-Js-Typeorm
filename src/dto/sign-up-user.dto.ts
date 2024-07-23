@@ -18,6 +18,6 @@ export class SignUpUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsEnum(['ADMIN', 'USER'])
-  role: 'ADMIN' | 'USER';
+  @IsEnum(['admin', 'user'])
+  role: 'admin'|'user';
 }

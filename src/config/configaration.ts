@@ -10,6 +10,8 @@ export default () => ({
   },
   jwt: {
     secret: process.env.TOKEN_SALT,
+    refreshTime: process.env.REFRESH_TIME,
+    accessTime: process.env.ACCESS_TIME
   },
   nodemail: {
     MAIL_HOST: process.env.MAIL_HOST,

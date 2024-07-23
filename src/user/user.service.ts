@@ -1,16 +1,18 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SignUpUserDto } from 'src/dto';
 import { UserRepository } from './user.repository';
-import * as bcrypt from "bcrypt";
+import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository,
-    private readonly configService: ConfigService
-  ) { }
-  
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly configService: ConfigService,
+    private readonly mailerService: MailerService,
+  ) {}
+
   async signup(signUpUserDto: SignUpUserDto) {
     try {
       const { email, password, ...rest } = signUpUserDto;

@@ -8,7 +8,7 @@ export class VerifyOtpDto {
 
   @IsUUID()
   @IsNotEmpty()
-  userId: string;
+  user_id: string;
 }
 
 export class RefreshTokenDto {
@@ -18,5 +18,5 @@ export class RefreshTokenDto {
 
   @IsUUID()
   @IsNotEmpty()
-  userId: string;
+  user_id: string;
 }

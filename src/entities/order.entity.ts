@@ -4,19 +4,30 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Service, User } from './index';
 
-@Entity()
+@Entity({ name: 'orders' })
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne((type) => User, { onDelete: 'CASCADE', onUpdate: 'NO ACTION' })
-  user_id: User;
+  @OneToOne(() => User, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
-  @ManyToOne((type) => Service, { onDelete: 'CASCADE', onUpdate: 'NO ACTION' })
-  service_id: Service;
+  @ManyToOne((type) => Service, {
+    onDelete: 'CASCADE',
+    onUpdate: 'NO ACTION',
+  })
+  @JoinColumn({ name: 'service_id' })
+  service: Service;
 
   @Column({
     nullable: false,
@@ -24,4 +35,10 @@ export class Order {
     enum: ['PENDING', 'COMPLETED', 'CANCELLED'],
   })
   status: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
