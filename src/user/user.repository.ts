@@ -69,4 +69,8 @@ export class UserRepository {
   async findOneToken(id: string) {
     return await this.refreshModel.findOne({ where: { user: { id } } })
   }
+
+  async deleteToken(id: string) {
+    await this.refreshModel.delete(id)
+  }
 }

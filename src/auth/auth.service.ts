@@ -9,7 +9,7 @@ import {
 } from '../dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from "bcrypt";
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
   ) {}
 
   signup(signUpUserDto: SignUpUserDto) {
@@ -91,7 +91,7 @@ export class AuthService {
           id: existUser.id,
           email,
           role: existUser.role,
-          username: existUser.username
+          username: existUser.username,
         },
         accessTime,
       );
@@ -101,7 +101,7 @@ export class AuthService {
           id: existUser.id,
           email,
           role: existUser.role,
-          username: existUser.username
+          username: existUser.username,
         },
         refreshTime,
       );
@@ -143,15 +143,110 @@ export class AuthService {
     return this.jwtService.sign(payload, { expiresIn: time });
   }
 
-  refresh_token(refreshTokenDto: RefreshTokenDto) {
-    return;
+  async refresh_token(refreshTokenDto: RefreshTokenDto) {
+    try {
+      const { user_id, refresh } = refreshTokenDto;
+
+      const existUser = await this.userRepository.findOneById(user_id);
+
+      if (!existUser) {
+        return new HttpException('User not Found', HttpStatus.BAD_REQUEST);
+      }
+
+      const decode = await this.jwtService.verify(refresh);
+
+      if (!decode) {
+        return new HttpException('You must be signin', HttpStatus.BAD_REQUEST);
+      }
+      const { id, email, role, username } = decode;
+
+      const accessTime = this.configService.get<string>('jwt.accessTime');
+      const refreshTime = this.configService.get<string>('jwt.refreshTime');
+
+      const accessToken = this.generateToken(
+        { id, email, role, username },
+        accessTime,
+      );
+
+      const refreshToken = this.generateToken(
+        { id, email, role, username },
+        refreshTime,
+      );
+
+      if (!accessToken || !refreshToken) {
+        return new HttpException(
+          'Internal Server Error',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      const newRefresh = await this.userRepository.createAndUpdateToken({
+        refresh: refreshToken,
+        user_id: existUser.id,
+      });
+
+      if (!newRefresh) {
+        return new HttpException(
+          'Internal Server Error',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      return { accessToken, refreshToken };
+    } catch (error) {
+      console.log(error);
+
+      return new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  getMe(request: any) {
-    return;
+  async getMe(request: any) {
+    try {
+      const existUser = await this.userRepository.findOneById(request.user.id);
+
+      if (!existUser) {
+        return new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      }
+
+      const { password, ...rest } = existUser;
+      return { ...rest };
+    } catch (error) {
+      console.log(error);
+
+      return new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  logout(request: any) {
-    return;
+  async logout(request: any) {
+    try {
+      const existToken = await this.userRepository.findOneToken(
+        request.user.id,
+      );
+
+      if (!existToken) {
+        return new HttpException('Not Found Token', HttpStatus.NOT_FOUND);
+      }
+
+      await this.userRepository.deleteToken(existToken.id);
+
+      return {
+        message: 'Logout Successfully',
+        accessToken: 'logout',
+        refreshToken: 'logout',
+      };
+    } catch (error) {
+      console.log(error);
+
+      return new HttpException(
+        'Internal Server Error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
