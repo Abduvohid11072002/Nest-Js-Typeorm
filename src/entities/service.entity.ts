@@ -17,7 +17,7 @@ export class Service {
   @Column({ nullable: false })
   description: string;
 
-  @Column({ nullable: false, type: 'decimal' })
+  @Column('float',{ nullable: false, })
   price: string;
 
   @CreateDateColumn()

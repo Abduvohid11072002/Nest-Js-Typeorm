@@ -2,7 +2,6 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToOne,
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
@@ -15,14 +14,14 @@ export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => User, {
+  @ManyToOne(() => User, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne((type) => Service, {
+  @ManyToOne(() => Service, {
     onDelete: 'CASCADE',
     onUpdate: 'NO ACTION',
   })
