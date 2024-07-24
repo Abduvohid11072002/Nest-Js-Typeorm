@@ -9,7 +9,7 @@ export class ServiceRepository {
   constructor(
     @InjectRepository(Service)
     private readonly serviceModel: Repository<Service>,
-  ) { }
+  ) {}
 
   async findOneByName(name: string): Promise<Service | undefined> {
     return this.serviceModel.findOne({ where: { name } });
@@ -27,8 +27,14 @@ export class ServiceRepository {
     return await this.serviceModel.save(service);
   }
 
-  async updateService(id: string, updateData: UpdateServiceDto): Promise<Service> {
-    await this.serviceModel.update(id, { ...updateData, price: updateData.price.toString() });
+  async updateService(
+    id: string,
+    updateData: UpdateServiceDto,
+  ): Promise<Service> {
+    await this.serviceModel.update(id, {
+      ...updateData,
+      price: updateData.price.toString(),
+    });
     return this.serviceModel.findOne({ where: { id } });
   }
 
@@ -36,7 +42,7 @@ export class ServiceRepository {
     await this.serviceModel.delete(id);
   }
 
-  async findAll(): Promise<Service[]> {
-    return this.serviceModel.find();
+  async findAll(skip: number, take: number): Promise<Service[]> {
+    return await this.serviceModel.find({ skip, take });
   }
 }

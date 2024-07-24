@@ -42,15 +42,15 @@ export class ServiceService {
     }
   }
 
-  async findAll() {
+  async findAll(skip: number, take: number) {
     try {
-      const services = await this.serviceRepository.findAll();
+      skip = (skip - 1) * take;
+      const services = await this.serviceRepository.findAll(skip, take);
 
       if (!services) {
-        return new HttpException('Not Found', HttpStatus.NOT_FOUND)
+        return new HttpException('Not Found', HttpStatus.NOT_FOUND);
       }
       return services;
-
     } catch (error) {
       console.log(error);
 
@@ -66,10 +66,9 @@ export class ServiceService {
       const existService = await this.serviceRepository.findOne(id);
 
       if (!existService) {
-        return new HttpException('Bad Request', HttpStatus.BAD_REQUEST)
+        return new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
       }
       return existService;
-      
     } catch (error) {
       console.log(error);
 
@@ -113,16 +112,15 @@ export class ServiceService {
       const existService = await this.serviceRepository.findOne(id);
 
       if (!existService) {
-        return new HttpException('Bad Request', HttpStatus.BAD_REQUEST)
+        return new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
       }
-      
+
       await this.serviceRepository.deleteService(id);
 
       return {
-        message: "Successfully deleted",
-        statusCode: 200
-      }
-
+        message: 'Successfully deleted',
+        statusCode: 200,
+      };
     } catch (error) {
       console.log(error);
 

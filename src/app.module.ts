@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from './config/config.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -39,6 +41,12 @@ import { ConfigModule } from './config/config.module';
     UserModule,
     OrderModule,
     ServiceModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 6000,
+        limit: 10,
+      },
+    ]),
   ],
   controllers: [],
   providers: [],
